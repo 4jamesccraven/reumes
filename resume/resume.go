@@ -1,5 +1,9 @@
 package resume
 
+import (
+	"github.com/noirbizarre/gonja"
+)
+
 type Resume struct {
 	Basics       Basics        `yaml:"basics"`
 	Awards       []Award       `yaml:"awards"`
@@ -96,7 +100,7 @@ type Certificate struct {
 type Publication struct {
 	Name        string `yaml:"name"`
 	Publisher   string `yaml:"publisher"`
-	Releasedate string `yaml:"releaseDate"`
+	ReleaseDate string `yaml:"releaseDate"`
 	Url         string `yaml:"url"`
 	Summary     string `yaml:"summary"`
 }
@@ -134,4 +138,22 @@ type Project struct {
 	Description string   `yaml:"description"`
 	Highlights  []string `yaml:"highlights"`
 	Url         string   `yaml:"url"`
+}
+
+// impl Resume //
+func (self *Resume) ExportContext() gonja.Context {
+	return gonja.Context{
+		"basics":       self.Basics,
+		"awards":       self.Awards,
+		"work":         self.Work,
+		"volunteer":    self.Volunteer,
+		"education":    self.Education,
+		"certificates": self.Certificates,
+		"publications": self.Publications,
+		"skills":       self.Skills,
+		"languages":    self.Languages,
+		"interests":    self.Interests,
+		"references":   self.References,
+		"projects":     self.Projects,
+	}
 }

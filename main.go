@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 
@@ -13,25 +14,67 @@ import (
 
 func main() {
 	cmd := &cli.Command{
-		Name:  "reumes",
-		Usage: "A resume builder based on the resume.json spec",
-		Flags: []cli.Flag{},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if cmd.NArg() < 1 {
-				return cli.Exit("no pos arg", 1)
-			}
+		Name:      "reumes",
+		Usage:     "A yaml-based resume builder using the resume.json spec",
+		UsageText: "reumes <INPUT_FILE> [OPTIONS]",
+		Arguments: []cli.Argument{
+			&cli.StringArg{
+				Name:      "inputFile",
+				UsageText: "input yaml file",
+				Value:     "reumes.yaml",
+			},
+		},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "template",
+				Aliases: []string{"t"},
+				Usage:   "the name of the template to use",
+				Value:   "reumes",
+				Validator: func(t string) error {
+					temps := resume.GetTemplates()
 
-			resumePath := cmd.Args().Get(0)
+					_, exists := temps[t]
+
+					if !exists {
+						return errors.New("non-existent template")
+					}
+
+					return nil
+				},
+			},
+			&cli.BoolFlag{
+				Name:    "debug",
+				Aliases: []string{"d"},
+				Usage:   "print additional debug info",
+				Value:   false,
+			},
+		},
+		Action: func(ctx context.Context, cmd *cli.Command) error {
+			resumePath := cmd.StringArg("inputFile")
 
 			data, err := os.ReadFile(resumePath)
-			if err != nil {
-				log.Fatalf("failed to read file: %v", err)
+			if err != nil && resumePath == "reumes.yaml" {
+				log.Fatal("input not specified and 'reumes.yaml' does not exist")
+			} else if err != nil {
+				log.Fatalf("failed to read '%s'", resumePath)
 			}
 
 			var res resume.Resume
 			err = yaml.Unmarshal(data, &res)
 
-			log.Printf("%s", res)
+			tempArg := cmd.String("template")
+			templates := resume.GetTemplates()
+			template, exists := templates[tempArg]
+
+			if !exists {
+				log.Fatalf("non-existent template")
+			}
+
+			outputError := template.Render(res)
+
+			if outputError != nil {
+				log.Fatalf("unable to produce output: %v", outputError)
+			}
 
 			return nil
 		},

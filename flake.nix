@@ -19,6 +19,9 @@
             go
             go-tools
             gotools
+
+            just
+            bat
           ];
         };
       }

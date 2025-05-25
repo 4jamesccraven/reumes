@@ -19,6 +19,9 @@ basics:
   - network: Twitter
     url: https://twitter.com/john
     username: john
+  - network: GitHub
+    url: https://github.com/john
+    username: john
   summary: "A summary of John Doe\u2026"
   url: https://johndoe.com
 certificates:
