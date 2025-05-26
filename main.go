@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -21,7 +22,6 @@ func main() {
 			&cli.StringArg{
 				Name:      "inputFile",
 				UsageText: "input yaml file",
-				Value:     "reumes.yaml",
 			},
 		},
 		Flags: []cli.Flag{
@@ -29,7 +29,7 @@ func main() {
 				Name:    "template",
 				Aliases: []string{"t"},
 				Usage:   "the name of the template to use",
-				Value:   "reumes",
+				Value:   "pdf",
 				Validator: func(t string) error {
 					temps := resume.GetTemplates()
 
@@ -50,30 +50,25 @@ func main() {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			resumePath := cmd.StringArg("inputFile")
-
-			data, err := os.ReadFile(resumePath)
-			if err != nil && resumePath == "reumes.yaml" {
-				log.Fatal("input not specified and 'reumes.yaml' does not exist")
-			} else if err != nil {
-				log.Fatalf("failed to read '%s'", resumePath)
+			// Path to resume data
+			res, err := GetResumeFileFromArg(cmd.StringArg("inputFile"))
+			if err != nil {
+				log.Fatalf("reumes error: %v", err)
 			}
 
-			var res resume.Resume
-			err = yaml.Unmarshal(data, &res)
-
+			// Use the resume data to fill a template
 			tempArg := cmd.String("template")
 			templates := resume.GetTemplates()
 			template, exists := templates[tempArg]
 
 			if !exists {
-				log.Fatalf("non-existent template")
+				log.Fatalf("reumes error: non-existent template")
 			}
 
 			outputError := template.Render(res)
 
 			if outputError != nil {
-				log.Fatalf("unable to produce output: %v", outputError)
+				log.Fatalf("reumes error: unable to produce output:\n%v", outputError)
 			}
 
 			return nil
@@ -83,4 +78,31 @@ func main() {
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func GetResumeFileFromArg(resumePath string) (resume.Resume, error) {
+	// Read the data file
+	data, err := os.ReadFile(resumePath)
+	if err != nil {
+		if resumePath == "" {
+			err = fmt.Errorf("no input data specified")
+		} else {
+			err = fmt.Errorf("failed to read '%s'", resumePath)
+		}
+		return resume.Resume{}, err
+	}
+
+	var res resume.Resume
+	err = yaml.Unmarshal(data, &res)
+	if err != nil {
+		err = fmt.Errorf(
+			"%v is not a data file. See https://jsonresume.org/schema for an example of a valid schema. %v",
+			resumePath,
+			err,
+		)
+
+		return resume.Resume{}, err
+	}
+
+	return res, nil
 }

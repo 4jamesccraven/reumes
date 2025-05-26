@@ -22,6 +22,7 @@
 
             just
             bat
+            typst
           ];
         };
       }

@@ -1,6 +1,9 @@
 package resume
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,57 +34,92 @@ func (self *Template) Render(res Resume) error {
 		return err
 	}
 
+	// Do post process if necessary, or dump the template
 	if self.PostProcess != "" {
-		// Create a temporary file to be post-processed
-		tmpFile, err := os.CreateTemp("", "reumes-*")
-		if err != nil {
-			return err
-		}
-		defer os.Remove(tmpFile.Name())
+		return self.DoPostProcess(out)
+	}
+	return self.DumpTemplate(out)
+}
 
-		if _, err := tmpFile.WriteString(out); err != nil {
-			return err
-		}
+func (self *Template) DoPostProcess(out string) error {
+	// Create a temporary file to be post-processed
+	tmpFile, err := ReumesTempFile(out)
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmpFile)
 
-		// Result of template
-		cmd := strings.ReplaceAll(self.PostProcess, "%template_result%", tmpFile.Name())
-		// Output file
-		cmd = strings.ReplaceAll(cmd, "%output_name%", self.OutputFile)
+	// Substitute the result of template...
+	cmd := strings.ReplaceAll(self.PostProcess, "%template_result%", tmpFile)
+	// ... and the output file
+	cmd = strings.ReplaceAll(cmd, "%output_name%", self.OutputFile)
 
-		// Post-process the file
-		var childHandle *exec.Cmd
-		if runtime.GOOS == "windows" {
-			childHandle = exec.Command("cmd", "/C", cmd)
-		} else {
-			childHandle = exec.Command("sh", "-c", cmd)
-		}
-
-		_, err = childHandle.CombinedOutput()
-		if err != nil {
-			return err
-		}
+	// Post-process the file, using sh or cmd
+	var childHandle *exec.Cmd
+	if runtime.GOOS != "windows" {
+		childHandle = exec.Command("sh", "-c", cmd)
 	} else {
-		// Use the template's output file, or supply a default
-		outputFile := self.OutputFile
-		if outputFile == "" {
-			outputFile = "reumes.out"
-		}
+		childHandle = exec.Command("cmd", "/C", cmd)
+	}
 
-		// Make the file
-		file, err := os.Create(outputFile)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		// Write the output
-		_, err = file.WriteString(out)
-		if err != nil {
-			return err
-		}
+	// Get the output of the commands, reporting errors if necessary
+	commandOutput, err := childHandle.CombinedOutput()
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println(string(commandOutput))
+		return err
 	}
 
 	return nil
+}
+
+func (self *Template) DumpTemplate(out string) error {
+	// Use the template's output file, or supply a default
+	outputFile := self.OutputFile
+	if outputFile == "" {
+		outputFile = "reumes.out"
+	}
+
+	// Make the file
+	file, err := os.Create(outputFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Write the output
+	_, err = file.WriteString(out)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Create a temporary file in the current dir to post process
+func ReumesTempFile(content string) (string, error) {
+	// Make a random string of digits for the file name
+	bytes := make([]byte, 10)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+
+	suffix := hex.EncodeToString(bytes)
+
+	// Create the temporary file
+	filename := filepath.Join(".", "reumes-"+suffix)
+	file, err := os.Create(filename)
+	if err != nil {
+		return "", nil
+	}
+	defer file.Close()
+
+	// Write the contents to the file
+	if _, err := file.WriteString(content); err != nil {
+		return "", nil
+	}
+
+	return filename, nil
 }
 
 func GetTemplates() map[string]Template {

@@ -1,0 +1,167 @@
+# Adapted from the "Professional" theme: https://registry.jsonresume.org/thomasdavis?theme=professional
+name: pdf
+outputFile: Resume.pdf
+postProcess: typst compile --root=. %template_result% %output_name%
+text: |
+  #align(center)[
+
+  {%- if basics.Image %}
+  #image("{{ basics.Image }}", width: 25%)
+  {%- endif %}
+
+  #text(size: 1.5em)[
+  = {{ basics.Name }}
+  ]
+
+  #text(size: 0.9em)[
+  #emoji.pin {{ basics.Location.Region }}, {{ basics.Location.CountryCode }}
+  #h(1cm)
+  #emoji.tray.mail #raw("{{ basics.Email }}")
+  #h(1cm)
+  #emoji.phone.receiver {{ basics.Phone }}
+
+  #emoji.chain {{ basics.Url }}
+  #h(1cm)
+  {%- for pf in basics.Profiles %}
+  #emoji.chain {{ pf.Network }}: #link("{{ pf.Url }}")[ {{ pf.Username }} ]
+  {%- if not loop.last %}
+  #h(1cm)
+  {%- endif %}
+  {%- endfor %}
+  ]]
+
+  #v(1cm)
+
+  {% if basics.Summary %}
+  {{ basics.Summary }}
+  {%- endif %}
+
+  == Experience
+  #line(length: 100%)
+  {%- for wk in work %}
+  #text(size: 1.1em)[*{{ wk.Position }}*]
+  #h(1fr) _{{ wk.StartDate}} #sym.dash.en {{ wk.EndDate }}_
+
+  #text(size: 0.9em)[_{{ wk.Name }}_]
+
+  {{ wk.Summary }}
+
+  {% for hl in wk.Highlights %}
+  - {{ hl }}
+  {%- endfor %}
+  {%- endfor %}
+  {%- for vt in volunteer %}
+  #text(size: 1.1em)[*{{ vt.Position }}*]
+  #text(size: 0.9em)[_(Volunteer Position)_]
+  #h(1fr) _{{ vt.StartDate}} #sym.dash.en {{ vt.EndDate }}_
+
+  #text(size: 0.9em)[_{{ vt.Organization }}_]
+
+  {{ vt.Summary }}
+  {% for hl in vt.Highlights %}
+  - {{ hl }}
+  {%- endfor %}
+  {%- endfor %}
+
+  == Projects
+  #line(length: 100%)
+  {%- for pj in projects %}
+  #text(size: 1.1em)[*{{ pj.Name }}*]
+  #h(1fr) _{{ pj.StartDate}} #sym.dash.en {{ pj.EndDate }}_
+
+  {{ pj.Description }}
+
+  {%- for hl in pj.Highlights %}
+  - {{ hl }}
+  {%- endfor %}
+  {%- endfor %}
+  == Education
+  #line(length: 100%)
+  {%- for ed in education %}
+  #text(size: 1.1em)[*{{ ed.Institution }}*]
+  #h(1fr) _{{ ed.StartDate}} #sym.dash.en {{ ed.EndDate }}_
+
+  #text(size: 0.9em)[_{{ ed.StudyType }} in {{ ed.Area }}, GPA: {{ ed.Score }}_]
+  {% if ed.Courses %}
+  #text(size: 0.9em)[*Relevant Coursework*]
+  {%- for cs in ed.Courses %}
+  - {{ cs }}
+  {%- endfor %}
+  {%- endif %}
+  {%- endfor %}
+  {%- if awards %}
+  == Awards
+  #line(length: 100%)
+  {%- for aw in awards %}
+  #text(size: 1.1em)[*{{ aw.Title }}*]
+  #h(1fr) _{{ aw.Date }}_
+
+  #text(size: 0.9em)[_{{ aw.Awarder }}_]
+
+  {{ aw.Summary }}
+  {%- endfor %}
+  {%- endif %}
+
+  {%- if publications %}
+  == Publications
+  #line(length: 100%)
+  {%- for pb in publications %}
+  #text(size: 1.1em)[*{{ pb.Name }}*]
+  #h(1fr) _{{ pb.ReleaseDate }}_
+
+  #text(size: 0.9em)[_{{ pb.Publisher }}_]
+
+  {% if pb.Url %}
+  {{ pb.Url }}
+  {%- endif %}
+
+  {{ pb.Summary }}
+  {%- endfor %}
+  {%- endif %}
+
+  {%- if certificates %}
+  == Certificates
+  #line(length: 100%)
+  {%- for ct in certificates %}
+  #text(size: 1.1em)[*{{ ct.Name }}*]
+  #h(1fr) _{{ ct.Date }}_
+
+  #text(size: 0.9em)[_{{ ct.Issuer }}_]
+
+  {% if ct.Url %}
+  {{ ct.Url }}
+  {%- endif %}
+  {%- endfor %}
+  {%- endif %}
+
+  {% if languages %}
+  == Languages
+  #line(length: 100%)
+  {%- for lg in languages %}
+  *{{ lg.Language }}:* {{ lg.Fluency }}
+  {%- endfor %}
+  {%- endif %}
+
+  == Skills
+  #line(length: 100%)
+  {%- for skill in skills %}
+  *{{ skill.Name }}:* {% for kw in skill.Keywords %}{{ kw }}{% if not loop.last %}, {% endif %}{% endfor %}
+  {%- endfor %}
+
+  {% if interests %}
+  == Interests
+  #line(length: 100%)
+  {%- for it in interests %}
+  *{{ it.Name }}:* {% for kw in it.Keywords %}{{ kw }}{% if not loop.last %}, {% endif %}{% endfor %}
+  {%- endfor %}
+  {%- endif %}
+
+  {% if references %}
+  == References
+  #line(length: 100%)
+  {%- for ref in references %}
+  *{{ ref.Name }}*
+
+  {{ ref.Reference }}
+  {%- endfor %}
+  {%- endif %}
