@@ -2,8 +2,10 @@ package resume
 
 import (
 	"crypto/rand"
+	"embed"
 	"encoding/hex"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -13,6 +15,9 @@ import (
 	"github.com/goccy/go-yaml"
 	"github.com/noirbizarre/gonja"
 )
+
+//go:embed templates/*
+var reumesTemplates embed.FS
 
 type Template struct {
 	Name        string `yaml:"name"`
@@ -122,8 +127,33 @@ func ReumesTempFile(content string) (string, error) {
 	return filename, nil
 }
 
-func GetTemplates() map[string]Template {
+func LoadDefaultTemplates(into map[string]Template) {
+	entries, err := reumesTemplates.ReadDir("templates")
+	if err != nil {
+		panic("Cannot read embedded templates")
+	}
+
+	for _, entry := range entries {
+		path := filepath.Join("templates", entry.Name())
+		data, err := fs.ReadFile(reumesTemplates, path)
+		if err != nil {
+			panic("Cannot read file in embedded templates")
+		}
+
+		var tmpl Template
+		if err := yaml.Unmarshal(data, &tmpl); err != nil {
+			panic("Invalid embedded template")
+		}
+
+		into[tmpl.Name] = tmpl
+	}
+
+}
+
+func LoadTemplates() map[string]Template {
 	templates := make(map[string]Template)
+
+	LoadDefaultTemplates(templates)
 
 	paths := strings.Split(os.Getenv("REUMES_PATH"), ":")
 	cwd, err := os.Getwd()

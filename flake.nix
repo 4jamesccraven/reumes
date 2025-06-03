@@ -20,8 +20,6 @@
             go-tools
             gotools
 
-            just
-            bat
             typst
           ];
         };
