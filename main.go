@@ -43,32 +43,41 @@ func main() {
 				},
 			},
 			&cli.BoolFlag{
-				Name:    "debug",
-				Aliases: []string{"d"},
-				Usage:   "print additional debug info",
+				Name:    "list",
+				Aliases: []string{"l"},
+				Usage:   "list available templates and exit",
 				Value:   false,
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			// Path to resume data
+			// Get available templates
+			templates := resume.GetTemplates()
+
+			// Print available templates and exit...
+			if cmd.Bool("list") {
+				for temp := range templates {
+					fmt.Println(temp)
+				}
+
+				return nil
+			}
+
+			// ...or do business logic
+
+			// Get the user's resume
 			res, err := GetResumeFileFromArg(cmd.StringArg("inputFile"))
 			if err != nil {
 				log.Fatalf("reumes error: %v", err)
 			}
 
-			// Use the resume data to fill a template
+			// Use the resume data to instantiate a template
 			tempArg := cmd.String("template")
-			templates := resume.GetTemplates()
-			template, exists := templates[tempArg]
-
-			if !exists {
-				log.Fatalf("reumes error: non-existent template")
-			}
+			template := templates[tempArg]
 
 			outputError := template.Render(res)
 
 			if outputError != nil {
-				log.Fatalf("reumes error: unable to produce output:\n%v", outputError)
+				log.Fatalf("reumes error: %v", outputError)
 			}
 
 			return nil
@@ -96,9 +105,8 @@ func GetResumeFileFromArg(resumePath string) (resume.Resume, error) {
 	err = yaml.Unmarshal(data, &res)
 	if err != nil {
 		err = fmt.Errorf(
-			"%v is not a data file. See https://jsonresume.org/schema for an example of a valid schema. %v",
+			"%v is not a valid resume. See https://jsonresume.org/schema.",
 			resumePath,
-			err,
 		)
 
 		return resume.Resume{}, err

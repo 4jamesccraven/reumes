@@ -30,13 +30,14 @@ func (self *Template) Render(res Resume) error {
 	// Get the user template
 	tpl, err := gonja.FromString(self.Text)
 	if err != nil {
-		return err
+		return fmt.Errorf("the attribute 'text' of template '%v'"+
+			"is not a valid jinja template: %v", self.Text, err)
 	}
 
 	// Use the Resume to populate it
 	out, err := tpl.Execute(res.ExportContext())
 	if err != nil {
-		return err
+		return fmt.Errorf("error filling in template: %v", err)
 	}
 
 	// Do post process if necessary, or dump the template
