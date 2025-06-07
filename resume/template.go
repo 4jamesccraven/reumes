@@ -135,7 +135,7 @@ func LoadDefaultTemplates(into map[string]Template) {
 	}
 
 	for _, entry := range entries {
-		path := filepath.Join("templates", entry.Name())
+		path := fmt.Sprintf("templates/%s", entry.Name())
 		data, err := fs.ReadFile(reumesTemplates, path)
 		if err != nil {
 			panic("Cannot read file in embedded templates")
