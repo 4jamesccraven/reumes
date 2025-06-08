@@ -1,46 +1,46 @@
 name: markdown
 outputFile : Resume.md
 text: |
-  # {{ basics.Name }}
-  {{ basics.Label }}
+  # {{ basics.name }}
+  {{ basics.label }}
 
-  {%- if basics.Summary %}
-  {{ basics.Summary }}
+  {%- if basics.summary %}
+  {{ basics.summary }}
 
   {%- endif %}
 
   ## Contact Info
-  {%- if basics.Email %}
-  - **Email:** [{{ basics.Email }}](mailto:{{ basics.Email }})
+  {%- if basics.email %}
+  - **Email:** [{{ basics.email }}](mailto:{{ basics.email }})
   {%- endif %}
-  {%- if basics.Phone %}
-  - **Phone:** {{ basics.Phone }}
+  {%- if basics.phone %}
+  - **Phone:** {{ basics.phone }}
   {%- endif %}
-  {%- if basics.Url %}
-  - **Website:** [{{ basics.Url }}]({{ basics.Url }})
+  {%- if basics.url %}
+  - **Website:** [{{ basics.url }}]({{ basics.url }})
   {%- endif %}
-  {%- for profile in basics.Profiles %}
-  - **{{ profile.Network }}:** [{{ profile.Username }}]({{ profile.Url }})
+  {%- for profile in basics.profiles %}
+  - **{{ profile.network }}:** [{{ profile.username }}]({{ profile.url }})
   {%- endfor %}
-  {%- if basics.Location %}
+  {%- if basics.location %}
   - **Mailing Address:**
 
-      {{ basics.Location.Address }}
+      {{ basics.location.address }}
 
-      {{ basics.Location.City }}, {{ basics.Location.Region }} {{ basics.Location.PostalCode }}
+      {{ basics.location.city }}, {{ basics.location.region }} {{ basics.location.postalCode }}
 
-      {{ basics.Location.CountryCode }}
+      {{ basics.location.countryCode }}
 
   {%- endif %}
   {% if work %}
   ## Past Work Experience
   {%- for wk in work %}
-  {{ loop.index }}. {{ wk.Position }} at [{{ wk.Name }}]({{ wk.Url }}); {{ wk.StartDate }} to {{ wk.EndDate }}
+  {{ loop.index }}. {{ wk.position }} at [{{ wk.name }}]({{ wk.url }}); {{ wk.startDate }} to {{ wk.endDate }}
 
-  > {{ wk.Summary }}
-  {% if wk.Highlights %}
+  > {{ wk.summary }}
+  {% if wk.highlights %}
   Highlights:
-  {%- for hl in wk.Highlights %}
+  {%- for hl in wk.highlights %}
   - {{ hl }}
   {%- endfor %}
   {%- endif %}
@@ -49,12 +49,12 @@ text: |
   {% if volunteer %}
   ## Volunteer Work
   {%- for vt in volunteer %}
-  {{ loop.index }}. {{ vt.Position }} at {{ vt.Organization }}; {{ vt.StartDate }} to {{ vt.EndDate }}
+  {{ loop.index }}. {{ vt.position }} at {{ vt.organization }}; {{ vt.startDate }} to {{ vt.endDate }}
 
-  > {{ vt.Summary }}
-  {% if vt.Highlights %}
+  > {{ vt.summary }}
+  {% if vt.highlights %}
   Highlights:
-  {%- for hl in vt.Highlights %}
+  {%- for hl in vt.highlights %}
   - {{ hl }}
   {%- endfor %}
   {%- endif %}
@@ -63,14 +63,14 @@ text: |
   {% if education %}
   ## Education
   {%- for ed in education %}
-  - {{ ed.StudyType }} in {{ ed.Area }}, [{{ ed.Institution }}]({{ ed.Url }})
+  - {{ ed.studyType }} in {{ ed.area }}, [{{ ed.institution }}]({{ ed.url }})
 
-  GPA: {{ ed.Score }}
+  GPA: {{ ed.score }}
 
-  {{ ed.StartDate }} to {{ ed.EndDate }}
-  {% if ed.Courses %}
+  {{ ed.startDate }} to {{ ed.endDate }}
+  {% if ed.courses %}
   **Relevant Coursework:**
-  {%- for crs in ed.Courses %}
+  {%- for crs in ed.courses %}
   - {{ crs }}
   {%- endfor %}
   {%- endif %}
@@ -79,55 +79,55 @@ text: |
   {% if awards %}
   ## Awards
   {%- for aw in awards %}
-  - **{{ aw.Title }}:** awarded by {{ aw.Awarder }} on {{ aw.Date }}
-  > {{ aw.Summary }}
+  - **{{ aw.title }}:** awarded by {{ aw.awarder }} on {{ aw.date }}
+  > {{ aw.summary }}
   {%- endfor %}
   {%- endif %}
   {% if certificates %}
   ## Certificates
   {%- for crt in certificates %}
-  - **{{ crt.Name }}:** issued by [{{ crt.Issuer }}]({{ crt.Url }})
+  - **{{ crt.name }}:** issued by [{{ crt.issuer }}]({{ crt.url }})
   {%- endfor %}
   {%- endif %}
   {% if publications %}
   ## Publications
   {%- for pbl in publications %}
-  {{ loop.index }}. **{{ pbl.Name }}:** [{{ pbl.Publisher }}]({{ pbl.Url }}), {{ pbl.ReleaseDate }}
-  > {{ pbl.Summary }}
+  {{ loop.index }}. **{{ pbl.name }}:** [{{ pbl.publisher }}]({{ pbl.url }}), {{ pbl.releaseDate }}
+  > {{ pbl.summary }}
   {%- endfor %}
   {%- endif %}
   {% if skills %}
   ## Skills
   {%- for skill in skills %}
-  - **{{ skill.Name }}:** {{ skill.Level }} ({%- for kw in skill.Keywords %}{{ kw }} {%- if not loop.last %}, {% endif -%} {%- endfor %})
+  - **{{ skill.name }}:** {{ skill.level }} ({%- for kw in skill.keywords %}{{ kw }} {%- if not loop.last %}, {% endif -%} {%- endfor %})
   {%- endfor %}
   {%- endif %}
   {% if languages %}
   ## Languages
   {%- for lg in languages %}
-  - **{{ lg.Language }}:** ({{ lg.Fluency }})
+  - **{{ lg.language }}:** ({{ lg.fluency }})
   {%- endfor %}
   {%- endif %}
   {% if interests %}
   ## Interests
   {%- for it in interests %}
-  - **{{ it.Name }}** ({% for kw in it.Keywords %}{{ kw }}{% if not loop.last %}, {% endif %}{% endfor %})
+  - **{{ it.name }}** ({% for kw in it.keywords %}{{ kw }}{% if not loop.last %}, {% endif %}{% endfor %})
   {%- endfor %}
   {%- endif %}
   {% if references %}
   ## References
   {%- for rf in references %}
-  - **{{ rf.Name }}:** {{ rf.Reference }}
+  - **{{ rf.name }}:** {{ rf.reference }}
   {%- endfor %}
   {%- endif %}
   {% if projects %}
   ## Projects
   {%- for pj in projects %}
-  - **[{{ pj.Name }}]({{ pj.Url }}):** ({{ pj.StartDate }} to {{ pj.EndDate }})
-  > {{ pj.Description }}
+  - **[{{ pj.name }}]({{ pj.url }}):** ({{ pj.startDate }} to {{ pj.endDate }})
+  > {{ pj.description }}
 
   **Highlights:**
-  {%- for hl in pj.Highlights %}
+  {%- for hl in pj.highlights %}
   - {{ hl }}
   {%- endfor %}
   {%- endfor %}

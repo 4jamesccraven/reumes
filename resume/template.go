@@ -20,10 +20,11 @@ import (
 var reumesTemplates embed.FS
 
 type Template struct {
-	Name        string `yaml:"name"`
-	Text        string `yaml:"text"`
-	OutputFile  string `yaml:"outputFile"`
-	PostProcess string `yaml:"postProcess"`
+	Name        string            `yaml:"name"`
+	Text        string            `yaml:"text"`
+	OutputFile  string            `yaml:"outputFile"`
+	PostProcess string            `yaml:"postProcess"`
+	Escapes     map[string]string `yaml:"escapes"`
 }
 
 func (self *Template) Render(res Resume) error {

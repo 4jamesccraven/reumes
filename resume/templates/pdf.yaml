@@ -2,30 +2,45 @@
 name: pdf
 outputFile: Resume.pdf
 postProcess: typst compile --root=. %template_result% %output_name%
+escapes:
+  "*": "\\*"
+  "_": "\\_"
+  "`": "\\`"
+  "<": "\\<"
+  ">": "\\>"
+  "@": "\\@"
+  "=": "\\="
+  "-": "\\-"
+  "+": "\\+"
+  "/": "\\/"
+  "$": "\\$"
+  "\\": "\\\\"
+  "~": "\\~"
+  "#": "\\#"
 text: |
   #align(center)[
 
   {%- if basics.Image %}
-  #image("{{ basics.Image }}", width: 25%)
+  #image("{{ basics.image }}", width: 25%)
   {%- endif %}
 
   #text(size: 1.5em)[
-  = {{ basics.Name }}
+  = {{ basics.name }}
   ]
 
   #text(size: 0.9em)[
-  #emoji.pin {{ basics.Location.City }}, {{ basics.Location.Region }}
+  #emoji.pin {{ basics.location.city }}, {{ basics.location.region }}
   #h(1cm)
-  #emoji.tray.mail #raw("{{ basics.Email }}")
+  #emoji.tray.mail #raw("{{ basics.email }}")
   #h(1cm)
-  #emoji.phone.receiver {{ basics.Phone }}
+  #emoji.phone.receiver {{ basics.phone }}
 
-  {% if basics.Url %}
-  #emoji.chain {{ basics.Url }}
+  {% if basics.url %}
+  #emoji.chain {{ basics.url }}
   #h(1cm)
   {%- endif %}
-  {%- for pf in basics.Profiles %}
-  #emoji.chain {{ pf.Network }}: #link("{{ pf.Url }}")[ {{ pf.Username }} ]
+  {%- for pf in basics.profiles %}
+  #emoji.chain {{ pf.network }}: #link("{{ pf.url }}")[ {{ pf.username }} ]
   {%- if not loop.last %}
   #h(1cm)
   {%- endif %}
@@ -34,33 +49,33 @@ text: |
 
   #v(1cm)
 
-  {% if basics.Summary %}
-  {{ basics.Summary }}
+  {% if basics.summary %}
+  {{ basics.summary }}
   {%- endif %}
 
   == Experience
   #line(length: 100%)
   {%- for wk in work %}
-  #text(size: 1.1em)[*{{ wk.Position }}*]
-  #h(1fr) _{{ wk.StartDate}} #sym.dash.en {{ wk.EndDate }}_
+  #text(size: 1.1em)[*{{ wk.position }}*]
+  #h(1fr) _{{ wk.startDate}} -- {{ wk.endDate }}_
 
-  #text(size: 0.9em)[_{{ wk.Name }}_]
+  #text(size: 0.9em)[_{{ wk.name }}_]
 
-  {{ wk.Summary }}
+  {{ wk.summary }}
 
-  {% for hl in wk.Highlights %}
+  {% for hl in wk.highlights %}
   - {{ hl }}
   {%- endfor %}
   {%- endfor %}
   {%- for vt in volunteer %}
-  #text(size: 1.1em)[*{{ vt.Position }}*]
+  #text(size: 1.1em)[*{{ vt.position }}*]
   #text(size: 0.9em)[_(Volunteer Position)_]
-  #h(1fr) _{{ vt.StartDate}} #sym.dash.en {{ vt.EndDate }}_
+  #h(1fr) _{{ vt.startDate}} -- {{ vt.endDate }}_
 
-  #text(size: 0.9em)[_{{ vt.Organization }}_]
+  #text(size: 0.9em)[_{{ vt.organization }}_]
 
-  {{ vt.Summary }}
-  {% for hl in vt.Highlights %}
+  {{ vt.summary }}
+  {% for hl in vt.highlights %}
   - {{ hl }}
   {%- endfor %}
   {%- endfor %}
@@ -68,12 +83,12 @@ text: |
   == Projects
   #line(length: 100%)
   {%- for pj in projects %}
-  #text(size: 1.1em)[*{{ pj.Name }}*]
-  #h(1fr) _{{ pj.StartDate}} #sym.dash.en {{ pj.EndDate }}_
+  #text(size: 1.1em)[*{{ pj.name }}*]
+  #h(1fr) _{{ pj.startDate}} -- {{ pj.endDate }}_
 
-  {{ pj.Description }}
+  {{ pj.description }}
 
-  {%- for hl in pj.Highlights %}
+  {%- for hl in pj.highlights %}
   - {{ hl }}
   {%- endfor %}
   {%- endfor %}
@@ -81,13 +96,13 @@ text: |
   == Education
   #line(length: 100%)
   {%- for ed in education %}
-  #text(size: 1.1em)[*{{ ed.Institution }}*]
-  #h(1fr) _{{ ed.StartDate}} #sym.dash.en {{ ed.EndDate }}_
+  #text(size: 1.1em)[*{{ ed.institution }}*]
+  #h(1fr) _{{ ed.startDate}} -- {{ ed.endDate }}_
 
-  #text(size: 0.9em)[_{{ ed.StudyType }} in {{ ed.Area }}, GPA: {{ ed.Score }}_]
-  {% if ed.Courses %}
+  #text(size: 0.9em)[_{{ ed.studyType }} in {{ ed.area }}, GPA: {{ ed.score }}_]
+  {% if ed.courses %}
   #text(size: 0.9em)[*Relevant Coursework*]
-  {%- for cs in ed.Courses %}
+  {%- for cs in ed.courses %}
   - {{ cs }}
   {%- endfor %}
   {%- endif %}
@@ -97,12 +112,12 @@ text: |
   == Awards
   #line(length: 100%)
   {%- for aw in awards %}
-  #text(size: 1.1em)[*{{ aw.Title }}*]
-  #h(1fr) _{{ aw.Date }}_
+  #text(size: 1.1em)[*{{ aw.title }}*]
+  #h(1fr) _{{ aw.date }}_
 
-  #text(size: 0.9em)[_{{ aw.Awarder }}_]
+  #text(size: 0.9em)[_{{ aw.awarder }}_]
 
-  {{ aw.Summary }}
+  {{ aw.summary }}
 
   {% endfor %}
   {%- endif %}
@@ -112,16 +127,16 @@ text: |
   == Publications
   #line(length: 100%)
   {%- for pb in publications %}
-  #text(size: 1.1em)[*{{ pb.Name }}*]
-  #h(1fr) _{{ pb.ReleaseDate }}_
+  #text(size: 1.1em)[*{{ pb.name }}*]
+  #h(1fr) _{{ pb.releaseDate }}_
 
-  #text(size: 0.9em)[_{{ pb.Publisher }}_]
+  #text(size: 0.9em)[_{{ pb.publisher }}_]
 
-  {% if pb.Url %}
-  {{ pb.Url }}
+  {% if pb.url %}
+  {{ pb.url }}
   {%- endif %}
 
-  {{ pb.Summary }}
+  {{ pb.summary }}
   {%- endfor %}
   {%- endif %}
 
@@ -130,13 +145,13 @@ text: |
   == Certificates
   #line(length: 100%)
   {%- for ct in certificates %}
-  #text(size: 1.1em)[*{{ ct.Name }}*]
-  #h(1fr) _{{ ct.Date }}_
+  #text(size: 1.1em)[*{{ ct.name }}*]
+  #h(1fr) _{{ ct.date }}_
 
-  #text(size: 0.9em)[_{{ ct.Issuer }}_]
+  #text(size: 0.9em)[_{{ ct.issuer }}_]
 
-  {% if ct.Url %}
-  {{ ct.Url }}
+  {% if ct.url %}
+  {{ ct.url }}
   {%- endif %}
 
   {% endfor %}
@@ -147,7 +162,7 @@ text: |
   == Languages
   #line(length: 100%)
   {%- for lg in languages %}
-  *{{ lg.Language }}:* {{ lg.Fluency }}
+  *{{ lg.language }}:* {{ lg.fluency }}
 
   {% endfor %}
   {%- endif %}
@@ -155,7 +170,7 @@ text: |
   == Skills
   #line(length: 100%)
   {%- for skill in skills %}
-  *{{ skill.Name }}:* {% for kw in skill.Keywords %}{{ kw }}{% if not loop.last %}, {% endif %}{% endfor %}
+  *{{ skill.name }}:* {% for kw in skill.keywords %}{{ kw }}{% if not loop.last %}, {% endif %}{% endfor %}
 
   {% endfor %}
 
@@ -164,7 +179,7 @@ text: |
   == Interests
   #line(length: 100%)
   {%- for it in interests %}
-  *{{ it.Name }}:* {% for kw in it.Keywords %}{{ kw }}{% if not loop.last %}, {% endif %}{% endfor %}
+  *{{ it.name }}:* {% for kw in it.keywords %}{{ kw }}{% if not loop.last %}, {% endif %}{% endfor %}
 
   {% endfor %}
   {%- endif %}
@@ -174,8 +189,8 @@ text: |
   == References
   #line(length: 100%)
   {%- for ref in references %}
-  *{{ ref.Name }}*
+  *{{ ref.name }}*
 
-  {{ ref.Reference }}
+  {{ ref.reference }}
   {%- endfor %}
   {%- endif %}

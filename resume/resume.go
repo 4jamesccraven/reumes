@@ -142,18 +142,7 @@ type Project struct {
 
 // impl Resume //
 func (self *Resume) ExportContext() gonja.Context {
-	return gonja.Context{
-		"basics":       self.Basics,
-		"awards":       self.Awards,
-		"work":         self.Work,
-		"volunteer":    self.Volunteer,
-		"education":    self.Education,
-		"certificates": self.Certificates,
-		"publications": self.Publications,
-		"skills":       self.Skills,
-		"languages":    self.Languages,
-		"interests":    self.Interests,
-		"references":   self.References,
-		"projects":     self.Projects,
-	}
+	ctx := self.baseContext()
+
+	return ctx
 }
